@@ -45,10 +45,10 @@ export function CompareResult({ r }: { r: CompareResults }) {
         <Card>
           <CardHeader><CardTitle>{r.response} by {r.factors.join(" × ")}</CardTitle></CardHeader>
           <CardBody>
-            <Plot
+            <Plot name={`${r.response}-by-${r.factors.join("-")}-boxplot`}
               data={[{ type: "box", x: r.plot.label, y: r.plot.y, boxpoints: "all", jitter: 0.4, pointpos: 0, marker: { size: 5, opacity: 0.6 }, line: { width: 1.5 } },
-                     { type: "scatter", mode: "markers", x: labels, y: r.groups.map((g) => g.mean), marker: { symbol: "diamond", size: 10, color: "#e8590c" }, name: "mean",
-                       error_y: { type: "data", symmetric: false, array: r.groups.map((g) => g.ci95[1] - g.mean), arrayminus: r.groups.map((g) => g.mean - g.ci95[0]), color: "#e8590c" } }]}
+                     { type: "scatter", mode: "markers", x: labels, y: r.groups.map((g) => g.mean), marker: { symbol: "diamond", size: 10, color: "#c2571a" }, name: "mean",
+                       error_y: { type: "data", symmetric: false, array: r.groups.map((g) => g.ci95[1] - g.mean), arrayminus: r.groups.map((g) => g.mean - g.ci95[0]), color: "#c2571a" } }]}
               layout={{ yaxis: { title: { text: r.response } }, xaxis: { categoryorder: "array", categoryarray: labels } }}
             />
             <p className="mt-1 text-xs text-slate-400">Box plots with individual points; orange diamonds are means with 95% CIs.</p>
@@ -58,7 +58,7 @@ export function CompareResult({ r }: { r: CompareResults }) {
           <Card>
             <CardHeader><CardTitle>Interaction plot</CardTitle></CardHeader>
             <CardBody>
-              <Plot data={traces} layout={{ showlegend: true, legend: { orientation: "h", y: -0.2 }, xaxis: { title: { text: r.interaction_plot.x } }, yaxis: { title: { text: `mean ${r.response} ± SE` } } }} />
+              <Plot name={`${r.response}-interaction`} data={traces} layout={{ showlegend: true, legend: { orientation: "h", y: -0.2 }, xaxis: { title: { text: r.interaction_plot.x } }, yaxis: { title: { text: `mean ${r.response} ± SE` } } }} />
               <p className="mt-1 text-xs text-slate-400">Non-parallel lines suggest an interaction.</p>
             </CardBody>
           </Card>

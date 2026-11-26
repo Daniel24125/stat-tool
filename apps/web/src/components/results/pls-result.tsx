@@ -35,8 +35,8 @@ export function PlsResult({ r }: { r: PlsResults }) {
         <Card>
           <CardHeader><CardTitle>Variable importance (VIP)</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={[{ type: "bar", orientation: "h", x: vip.map((v) => v.vip), y: vip.map((v) => v.variable), marker: { color: vip.map((v) => (v.vip >= 1 ? "#2f6fed" : "#cbd5e1")) } },
-                         { type: "scatter", mode: "lines", x: [1, 1], y: [vip[0]?.variable, vip[vip.length - 1]?.variable], line: { dash: "dash", color: "#e8590c" } }]}
+            <Plot name={"pls-vip"} data={[{ type: "bar", orientation: "h", x: vip.map((v) => v.vip), y: vip.map((v) => v.variable), marker: { color: vip.map((v) => (v.vip >= 1 ? "#0f6b68" : "#cbd5e1")) } },
+                         { type: "scatter", mode: "lines", x: [1, 1], y: [vip[0]?.variable, vip[vip.length - 1]?.variable], line: { dash: "dash", color: "#c2571a" } }]}
               layout={{ xaxis: { title: { text: "VIP" } }, margin: { l: 120 } }} height={Math.max(260, 22 * vip.length + 80)} />
             <p className="mt-1 text-xs text-slate-400">VIP &gt; 1 (blue): variable is important for the model.</p>
           </CardBody>
@@ -45,7 +45,7 @@ export function PlsResult({ r }: { r: PlsResults }) {
           <Card>
             <CardHeader><CardTitle>Scores (coloured by {r.class_column})</CardTitle></CardHeader>
             <CardBody>
-              <Plot data={groupTraces(r.scores.t1, r.scores.t2 ?? r.scores.t1.map(() => 0), r.scores.color, text)}
+              <Plot name={"pls-scores"} data={groupTraces(r.scores.t1, r.scores.t2 ?? r.scores.t1.map(() => 0), r.scores.color, text)}
                 layout={{ showlegend: true, legend: { orientation: "h", y: -0.2 }, xaxis: { title: { text: "t1" } }, yaxis: { title: { text: r.scores.t2 ? "t2" : "" } } }} />
             </CardBody>
           </Card>
@@ -56,7 +56,7 @@ export function PlsResult({ r }: { r: PlsResults }) {
               {(() => {
                 const o = r.observed!.map((v) => v[0]), p = r.cv_predicted!.map((v) => v[0]);
                 const lo = Math.min(...o, ...p), hi = Math.max(...o, ...p);
-                return <Plot data={[{ type: "scatter", mode: "markers", x: o, y: p, text, marker: { size: 7, opacity: 0.8 } },
+                return <Plot name={"pls-observed-vs-predicted"} data={[{ type: "scatter", mode: "markers", x: o, y: p, text, marker: { size: 7, opacity: 0.8 } },
                                     { type: "scatter", mode: "lines", x: [lo, hi], y: [lo, hi], line: { dash: "dash", color: "#94a3b8" } }]}
                   layout={{ xaxis: { title: { text: "observed" } }, yaxis: { title: { text: "predicted (CV)" } } }} />;
               })()}
@@ -70,8 +70,8 @@ export function PlsResult({ r }: { r: PlsResults }) {
         <Card>
           <CardHeader><CardTitle>Permutation test ({r.permutation.n} permutations)</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={[{ type: "histogram", x: r.permutation.q2_values, marker: { color: "#cbd5e1" }, name: "shuffled Y" },
-                         { type: "scatter", mode: "lines", x: [r.q2, r.q2], y: [0, r.permutation.n / 4], line: { color: "#2f6fed", width: 3 }, name: "real model" }]}
+            <Plot name={"pls-permutation-test"} data={[{ type: "histogram", x: r.permutation.q2_values, marker: { color: "#cbd5e1" }, name: "shuffled Y" },
+                         { type: "scatter", mode: "lines", x: [r.q2, r.q2], y: [0, r.permutation.n / 4], line: { color: "#0f6b68", width: 3 }, name: "real model" }]}
               layout={{ xaxis: { title: { text: "Q²" } }, yaxis: { title: { text: "count" } } }} height={260} />
             <p className="mt-1 text-xs text-slate-400">The blue line (real Q²) should lie well to the right of the grey distribution. p = {fmt(r.permutation.p, 3)}.</p>
           </CardBody>
@@ -79,7 +79,7 @@ export function PlsResult({ r }: { r: PlsResults }) {
         <Card>
           <CardHeader><CardTitle>Q² by number of components</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={[{ type: "scatter", mode: "lines+markers", x: r.q2_by_component.map((_, i) => i + 1), y: r.q2_by_component, marker: { color: r.q2_by_component.map((_, i) => (i + 1 === r.n_components ? "#e8590c" : "#2f6fed")), size: 9 } }]}
+            <Plot name={"pls-q2-by-component"} data={[{ type: "scatter", mode: "lines+markers", x: r.q2_by_component.map((_, i) => i + 1), y: r.q2_by_component, marker: { color: r.q2_by_component.map((_, i) => (i + 1 === r.n_components ? "#c2571a" : "#0f6b68")), size: 9 } }]}
               layout={{ xaxis: { title: { text: "components" }, dtick: 1 }, yaxis: { title: { text: "cumulative Q²" } } }} height={260} />
           </CardBody>
         </Card>

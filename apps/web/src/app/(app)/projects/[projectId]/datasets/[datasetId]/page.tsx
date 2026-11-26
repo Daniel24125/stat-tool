@@ -34,7 +34,7 @@ export default async function DatasetPage({ params }: { params: Promise<{ projec
       <div className="flex items-start justify-between gap-4">
         <div>
           <Link href={`/projects/${projectId}`} className="text-sm text-slate-500 hover:text-slate-800">← {dataset.project.name}</Link>
-          <h1 className="mt-1 text-2xl font-semibold">{dataset.name}</h1>
+          <h1 className="mt-1 text-3xl">{dataset.name}</h1>
           <p className="mt-1 text-xs text-slate-500">
             {dataset.fileName} · {(dataset.sizeBytes / 1024).toFixed(1)} KB · SHA-256 {dataset.sha256.slice(0, 12)}…
           </p>
@@ -47,15 +47,17 @@ export default async function DatasetPage({ params }: { params: Promise<{ projec
       </div>
 
       {dataset.status === "READY" && profile ? (
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_380px]">
-          <div className="order-2 xl:order-1"><ProfileView profile={profile} /></div>
-          <div className="order-1 space-y-6 xl:order-2">
-            {canEdit && (
-              <Card>
-                <CardHeader><CardTitle>New analysis</CardTitle></CardHeader>
-                <CardBody><AnalysisForm projectId={projectId} datasetId={datasetId} columns={profile.columns} outlierRuns={outlierRuns} /></CardBody>
-              </Card>
-            )}
+        <>
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_340px]">
+          {canEdit ? (
+            <Card>
+              <CardHeader><CardTitle>New analysis</CardTitle></CardHeader>
+              <CardBody><AnalysisForm projectId={projectId} datasetId={datasetId} columns={profile.columns} outlierRuns={outlierRuns} /></CardBody>
+            </Card>
+          ) : (
+            <Card><CardBody className="text-sm text-slate-600">You have view access to this project. Ask an owner to make you an editor to run analyses.</CardBody></Card>
+          )}
+          <div className="space-y-6">
             <Card>
               <CardHeader><CardTitle>Analyses ({dataset.runs.length})</CardTitle></CardHeader>
               <ul className="divide-y divide-slate-100">
@@ -79,6 +81,10 @@ export default async function DatasetPage({ params }: { params: Promise<{ projec
             </Card>
           </div>
         </div>
+        <h2 className="mt-12 font-serif text-2xl">Data profile</h2>
+        <p className="mb-4 mt-1 text-sm text-slate-500">How each column was read, with distributions and data-quality notes.</p>
+        <ProfileView profile={profile} />
+        </>
       ) : (
         <Card className="mt-6">
           <CardBody>

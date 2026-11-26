@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Hanken_Grotesk, Newsreader } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+
+const hanken = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-hanken", display: "swap" });
+const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader", style: ["normal", "italic"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "StatTool",
@@ -9,10 +13,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${hanken.variable} ${newsreader.variable}`}>
       <body>
         {children}
-        <Toaster richColors position="bottom-right" />
+        <Toaster position="bottom-right" toastOptions={{ className: "!font-sans !rounded-[10px] !border-rule" }} />
       </body>
     </html>
   );

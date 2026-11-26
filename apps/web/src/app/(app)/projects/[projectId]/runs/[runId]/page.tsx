@@ -34,7 +34,7 @@ export default async function RunPage({ params }: { params: Promise<{ projectId:
       <div>
         <Link href={`/projects/${projectId}/datasets/${run.dataset.id}`} className="text-sm text-slate-500 hover:text-slate-800">← {run.dataset.name}</Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold">{run.name}</h1>
+          <h1 className="text-3xl">{run.name}</h1>
           <RunStatusBadge status={run.status} />
         </div>
         <p className="mt-1 text-xs text-slate-500">

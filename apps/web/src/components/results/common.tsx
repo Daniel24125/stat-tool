@@ -49,8 +49,14 @@ export function DataInfoLine({ info }: { info: DataInfo }) {
   );
 }
 
+/** The result written as it would read in a paper's results section. */
 export function Summary({ text }: { text: string }) {
-  return <div className="rounded-xl border border-brand-100 bg-brand-50 px-5 py-4 text-sm text-slate-800">{text}</div>;
+  return (
+    <figure className="border-l-2 border-brand-600 py-1 pl-5">
+      <blockquote className="max-w-[70ch] font-serif text-[1.3rem] leading-relaxed text-ink">{text}</blockquote>
+      <figcaption className="mt-1 text-xs text-slate-500">Finding, as reported</figcaption>
+    </figure>
+  );
 }
 
 export function Table({ head, rows, className }: { head: React.ReactNode[]; rows: React.ReactNode[][]; className?: string }) {
@@ -70,7 +76,7 @@ export function Table({ head, rows, className }: { head: React.ReactNode[]; rows
 
 export function P({ p, sig }: { p: number | null; sig?: boolean }) {
   const s = sig ?? (p !== null && p < 0.05);
-  return <span className={s ? "font-semibold text-emerald-700" : "text-slate-600"}>{fmtP(p)}{s ? " *" : ""}</span>;
+  return <span className={s ? "mark-sig font-semibold text-ink" : "text-slate-600"}>{fmtP(p)}{s ? " *" : ""}</span>;
 }
 
 export { fmt };

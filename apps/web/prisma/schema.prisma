@@ -33,6 +33,7 @@ model User {
   runs          AnalysisRun[]
   pipelines     Pipeline[]
   pipelineRuns  PipelineRun[]
+  templates     PipelineTemplate[]
 }
 
 model Project {
@@ -183,4 +184,18 @@ model PipelineRun {
 
   @@index([pipelineId, createdAt])
   @@index([datasetId])
+}
+
+// A personal, dataset-independent pipeline recipe (steps refer to roles, not columns).
+model PipelineTemplate {
+  id          String   @id @default(cuid())
+  ownerId     String
+  name        String
+  description String?
+  steps       Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
 }

@@ -32,7 +32,7 @@ export default async function PipelineRunPage({ params }: { params: Promise<{ pr
       <div>
         <Link href={`/projects/${projectId}/pipelines/${pr.pipeline.id}`} className="text-sm text-slate-500 hover:text-slate-800">← {pr.pipeline.name}</Link>
         <div className="mt-1 flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">{pr.pipeline.name} on {pr.dataset.name}</h1>
+          <h1 className="text-3xl">{pr.pipeline.name} on {pr.dataset.name}</h1>
           <RunStatusBadge status={pr.status} />
         </div>
         <p className="mt-1 text-xs text-slate-500">by {pr.createdBy.name ?? pr.createdBy.email} · {pr.createdAt.toLocaleString()}{pr.finishedAt && ` · ${((+pr.finishedAt - +pr.createdAt) / 1000).toFixed(1)} s`}</p>
