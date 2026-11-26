@@ -1,0 +1,76 @@
+name: stattool
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: stattool
+      POSTGRES_PASSWORD: stattool
+      POSTGRES_DB: stattool
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stattool"]
+      interval: 3s
+      retries: 20
+
+  # S3-compatible object storage (RustFS; MinIO no longer publishes images).
+  s3:
+    image: rustfs/rustfs:latest
+    command: /data
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID:-stattool}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY:-stattool-secret}
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports: ["9000:9000", "9001:9001"]
+    volumes: [s3data:/data]
+
+  s3-init:
+    image: amazon/aws-cli:latest
+    depends_on: [s3]
+    entrypoint: >
+      sh -c "for i in $$(seq 1 30); do
+      aws --endpoint-url http://s3:9000 s3api head-bucket --bucket $${S3_BUCKET} 2>/dev/null && exit 0;
+      aws --endpoint-url http://s3:9000 s3 mb s3://$${S3_BUCKET} && exit 0; sleep 2; done; exit 1"
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-stattool}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-stattool-secret}
+      AWS_DEFAULT_REGION: us-east-1
+      S3_BUCKET: ${S3_BUCKET:-stattool}
+
+  stats:
+    build: ./services/stats
+    environment:
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?set INTERNAL_API_KEY in .env}
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      retries: 20
+
+  migrate:
+    build: { context: ./apps/web, target: builder }
+    command: npx prisma migrate deploy
+    environment:
+      DATABASE_URL: postgresql://stattool:stattool@db:5432/stattool
+    depends_on: { db: { condition: service_healthy } }
+
+  web:
+    build: ./apps/web
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://stattool:stattool@db:5432/stattool
+      STATS_API_URL: http://stats:8000
+      S3_ENDPOINT: http://s3:9000
+      S3_FORCE_PATH_STYLE: "true"
+      S3_REGION: us-east-1
+      APP_BASE_URL: http://localhost:3000
+    ports: ["3000:3000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      s3-init: { condition: service_completed_successfully }
+      stats: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  s3data:

@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum DatasetStatus {
+  PROFILING
+  READY
+  FAILED
+}
+
+model User {
+  id            String          @id @default(cuid())
+  auth0Sub      String          @unique
+  email         String?         @unique
+  name          String?
+  picture       String?
+  createdAt     DateTime        @default(now())
+  lastLoginAt   DateTime        @default(now())
+  memberships   ProjectMember[]
+  notifications Notification[]
+  datasets      Dataset[]
+  runs          AnalysisRun[]
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  members     ProjectMember[]
+  datasets    Dataset[]
+  runs        AnalysisRun[]
+}
+
+model ProjectMember {
+  projectId String
+  userId    String
+  role      Role
+  addedAt   DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, userId])
+  @@index([userId])
+}
+
+model Dataset {
+  id          String        @id @default(cuid())
+  projectId   String
+  name        String
+  fileName    String
+  storageKey  String
+  sizeBytes   Int
+  sha256      String
+  status      DatasetStatus @default(PROFILING)
+  error       String?
+  nRows       Int?
+  nCols       Int?
+  profile     Json?
+  createdById String
+  createdAt   DateTime      @default(now())
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy   User          @relation(fields: [createdById], references: [id])
+  runs        AnalysisRun[]
+
+  @@index([projectId])
+}
+
+enum AnalysisType {
+  OUTLIERS
+  COMPARE
+  REGRESSION
+  CORRELATION
+  PCA
+  PLS
+  CLUSTER
+}
+
+enum RunStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+model AnalysisRun {
+  id           String       @id @default(cuid())
+  projectId    String
+  datasetId    String
+  type         AnalysisType
+  name         String
+  params       Json
+  excludeRows  Int[]
+  // For OUTLIERS runs: the rows the user confirmed for exclusion.
+  exclusions   Int[]
+  exclusionsConfirmed Boolean @default(false)
+  sourceRunId  String?
+  status       RunStatus    @default(QUEUED)
+  results      Json?
+  error        String?
+  durationMs   Int?
+  createdById  String
+  createdAt    DateTime     @default(now())
+  finishedAt   DateTime?
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  dataset      Dataset      @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation(fields: [createdById], references: [id])
+
+  @@index([datasetId, createdAt])
+  @@index([projectId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  projectId String?
+  kind      String
+  message   String
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
