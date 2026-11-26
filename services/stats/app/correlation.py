@@ -49,5 +49,9 @@ def correlation(df: pd.DataFrame, columns: list[str], method: str = "auto", excl
         pp["significant"] = bool(pa < ALPHA)
 
     matrix = data[columns].corr(method=method).to_numpy()
+    sig = [p for p in pairs if p["significant"]]
+    strongest = max(pairs, key=lambda p: abs(p["r"]))
+    summary = (f"{'Pearson' if method == 'pearson' else 'Spearman'} correlation: {len(sig)} of {len(pairs)} pair(s) significant after Holm correction; "
+               f"strongest {strongest['a']}–{strongest['b']} ({'r' if method == 'pearson' else 'ρ'} = {strongest['r']:.2f}).")
     return clean({"type": "correlation", "method": method, "columns": columns, "data_info": info, "trail": trail.steps,
-                  "normality": normality, "pairs": pairs, "matrix": matrix, "warnings": []})
+                  "normality": normality, "pairs": pairs, "matrix": matrix, "warnings": [], "summary": summary})

@@ -29,6 +29,11 @@ services/stats   FastAPI statistics service (pandas, SciPy, …)
 - **Clustering**: k-means vs Ward for k = 2–10 chosen by silhouette, dendrogram, cluster profiles, adjusted Rand index vs known groups
 - Tests: PCA reproduces published iris variance (72.96 % / 22.85 %)
 
+## Phase 4 status
+- **Pipelines**: reusable, ordered steps (outliers, significance, regression, correlation, PCA, PLS, clustering) saved per project; one-click "standard assessment" template
+- Significance steps take several responses and run one comparison each; outlier steps can exclude their suggested rows from every later step (recorded on the run)
+- Runs check the dataset has every column first, execute in the background, show a live step timeline with one-line summaries, and notify members when done
+
 ## Run with Docker Compose
 1. In Auth0, create a **Regular Web Application**:
    - Allowed Callback URLs: `http://localhost:3000/auth/callback`
