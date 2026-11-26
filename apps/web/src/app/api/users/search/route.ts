@@ -5,25 +5,29 @@ import { currentUser } from "@/lib/session";
 import { maskEmail } from "@/lib/utils";
 
 /**
- * Member search for the share dialog. Reads only StatTool's own User table
- * (users who have logged in to this app), never the Auth0 tenant.
- * Only project owners may search; results exclude existing members.
+ * Member search. Reads only StatTool's own User table (people who have logged
+ * in to this app), never the Auth0 tenant. With a projectId, only that
+ * project's owners may search and existing members are left out; without one
+ * (the new-project dialog), any signed-in user may search and is left out.
  */
 export async function GET(req: NextRequest) {
   const me = await currentUser();
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
-  const projectId = req.nextUrl.searchParams.get("projectId") ?? "";
+  const projectId = req.nextUrl.searchParams.get("projectId");
   if (q.length < 3) return NextResponse.json({ users: [] });
 
-  const membership = await db.projectMember.findUnique({ where: { projectId_userId: { projectId, userId: me.id } } });
-  if (!membership || !hasRole(membership.role, "OWNER")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (projectId) {
+    const membership = await db.projectMember.findUnique({ where: { projectId_userId: { projectId, userId: me.id } } });
+    if (!membership || !hasRole(membership.role, "OWNER")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const users = await db.user.findMany({
     where: {
+      id: { not: me.id },
       OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { startsWith: q, mode: "insensitive" } }],
-      memberships: { none: { projectId } },
+      ...(projectId ? { memberships: { none: { projectId } } } : {}),
     },
     take: 8,
     orderBy: { name: "asc" },

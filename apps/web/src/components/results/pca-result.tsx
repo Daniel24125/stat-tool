@@ -63,7 +63,7 @@ export function PcaResult({ r }: { r: PcaResults }) {
             )}
           </CardHeader>
           <CardBody>
-            <Plot data={[...groupTraces(sx, sy, r.scores.color, text), ...arrows]}
+            <Plot name={`pca-biplot-pc${ax[0] + 1}-pc${ax[1] + 1}`} data={[...groupTraces(sx, sy, r.scores.color, text), ...arrows]}
               layout={{ showlegend: !!r.scores.color, legend: { orientation: "h", y: -0.2 }, xaxis: { title: { text: lab(ax[0]) }, zeroline: true }, yaxis: { title: { text: lab(ax[1]) }, zeroline: true } }} height={400} />
             <p className="mt-1 text-xs text-slate-400">Points are samples (scores); arrows are variables (loadings). Variables pointing the same way are positively correlated.</p>
           </CardBody>
@@ -71,8 +71,8 @@ export function PcaResult({ r }: { r: PcaResults }) {
         <Card>
           <CardHeader><CardTitle>Scree plot</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={[{ type: "bar", x: r.explained.map((_, i) => `PC${i + 1}`), y: r.explained.map((e) => 100 * e), marker: { color: r.explained.map((_, i) => (i < k ? "#2f6fed" : "#cbd5e1")) }, name: "% variance" },
-                         { type: "scatter", mode: "lines+markers", x: r.cumulative.map((_, i) => `PC${i + 1}`), y: r.cumulative.map((c) => 100 * c), line: { color: "#e8590c" }, name: "cumulative %" }]}
+            <Plot name={"pca-scree"} data={[{ type: "bar", x: r.explained.map((_, i) => `PC${i + 1}`), y: r.explained.map((e) => 100 * e), marker: { color: r.explained.map((_, i) => (i < k ? "#0f6b68" : "#cbd5e1")) }, name: "% variance" },
+                         { type: "scatter", mode: "lines+markers", x: r.cumulative.map((_, i) => `PC${i + 1}`), y: r.cumulative.map((c) => 100 * c), line: { color: "#c2571a" }, name: "cumulative %" }]}
               layout={{ yaxis: { title: { text: "% of variance" }, range: [0, 105] }, showlegend: true, legend: { orientation: "h", y: -0.2 } }} height={400} />
           </CardBody>
         </Card>
@@ -93,8 +93,8 @@ export function PcaResult({ r }: { r: PcaResults }) {
         <Card>
           <CardHeader><CardTitle>Influence plot: Hotelling&apos;s T² vs Q residuals</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={[
-              { type: "scatter", mode: "markers", x: r.diagnostics.t2, y: r.diagnostics.q, text, marker: { size: 7, color: r.scores.rows.map((row) => (r.diagnostics.atypical.includes(row) ? "#c92a2a" : "#2f6fed")) } },
+            <Plot name={"pca-t2-q-influence"} data={[
+              { type: "scatter", mode: "markers", x: r.diagnostics.t2, y: r.diagnostics.q, text, marker: { size: 7, color: r.scores.rows.map((row) => (r.diagnostics.atypical.includes(row) ? "#c92a2a" : "#0f6b68")) } },
               ...(r.diagnostics.t2_limit ? [{ type: "scatter" as const, mode: "lines" as const, x: [r.diagnostics.t2_limit, r.diagnostics.t2_limit], y: [0, Math.max(...r.diagnostics.q, r.diagnostics.q_limit ?? 0) * 1.05], line: { dash: "dash" as const, color: "#94a3b8" } }] : []),
               ...(r.diagnostics.q_limit ? [{ type: "scatter" as const, mode: "lines" as const, x: [0, Math.max(...r.diagnostics.t2, r.diagnostics.t2_limit ?? 0) * 1.05], y: [r.diagnostics.q_limit, r.diagnostics.q_limit], line: { dash: "dash" as const, color: "#94a3b8" } }] : []),
             ]} layout={{ xaxis: { title: { text: "Hotelling's T² (distance within the model)" } }, yaxis: { title: { text: "Q residual (distance to the model)" } } }} height={320} />

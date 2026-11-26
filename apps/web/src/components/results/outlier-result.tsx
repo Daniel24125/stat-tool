@@ -25,10 +25,10 @@ export function OutlierResult({ r, projectId, runId, canEdit, saved, confirmed }
   const [cx, cy] = r.columns;
   const plotData = cy
     ? [{ type: "scatter" as const, mode: "markers" as const, x: r.plot.values[cx], y: r.plot.values[cy], text: r.plot.rows.map((x) => `row ${x + 1}`),
-         marker: { size: excluded.map((e) => (e ? 11 : 7)), color: excluded.map((e) => (e ? "#c92a2a" : "#2f6fed")), opacity: 0.75 } }]
+         marker: { size: excluded.map((e) => (e ? 11 : 7)), color: excluded.map((e) => (e ? "#c92a2a" : "#0f6b68")), opacity: 0.75 } }]
     : [{ type: "box" as const, x: r.plot.group ?? undefined, y: r.plot.values[cx], boxpoints: false as const, line: { color: "#94a3b8" } },
        { type: "scatter" as const, mode: "markers" as const, x: r.plot.group ?? r.plot.rows.map(() => cx), y: r.plot.values[cx], text: r.plot.rows.map((x) => `row ${x + 1}`),
-         marker: { size: excluded.map((e) => (e ? 11 : 6)), color: excluded.map((e) => (e ? "#c92a2a" : "#2f6fed")), opacity: 0.7 } }];
+         marker: { size: excluded.map((e) => (e ? 11 : 6)), color: excluded.map((e) => (e ? "#c92a2a" : "#0f6b68")), opacity: 0.7 } }];
 
   function save() {
     start(async () => {
@@ -50,7 +50,7 @@ export function OutlierResult({ r, projectId, runId, canEdit, saved, confirmed }
         <Card>
           <CardHeader><CardTitle>{cy ? `${cx} vs ${cy}` : cx}{r.columns.length > 2 ? " (first two variables)" : ""}</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={plotData} layout={{ xaxis: { title: { text: cy ? cx : r.group_by ?? "" } }, yaxis: { title: { text: cy ?? cx } } }} />
+            <Plot name={`outliers-${r.columns.join("-")}`} data={plotData} layout={{ xaxis: { title: { text: cy ? cx : r.group_by ?? "" } }, yaxis: { title: { text: cy ?? cx } } }} />
             <p className="mt-1 text-xs text-slate-400">Red points are currently selected for exclusion.</p>
           </CardBody>
         </Card>

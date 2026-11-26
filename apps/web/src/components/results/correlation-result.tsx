@@ -21,7 +21,7 @@ export function CorrelationResult({ r }: { r: CorrelationResults }) {
         <Card>
           <CardHeader><CardTitle>Correlation matrix</CardTitle></CardHeader>
           <CardBody>
-            <Plot
+            <Plot name={`correlation-${r.method}-heatmap`}
               data={[{ type: "heatmap", z: r.matrix, x: r.columns, y: r.columns, zmin: -1, zmax: 1, colorscale: "RdBu", reversescale: true,
                        text: r.matrix.map((row) => row.map((v) => fmt(v, 2))) as unknown as string[], texttemplate: "%{text}", hoverongaps: false }]}
               layout={{ yaxis: { autorange: "reversed" }, margin: { l: 100, b: 90, t: 16, r: 16 } }}

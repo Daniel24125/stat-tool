@@ -1,16 +1,48 @@
 @import "tailwindcss";
 
+/*
+  StatTool tokens.
+  Paper/ink with a lab-teal action colour. Highlighter yellow is reserved for
+  statistically significant results, so it always means the same thing.
+*/
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-brand-50: #eef6ff;
-  --color-brand-100: #d9eaff;
-  --color-brand-500: #2f6fed;
-  --color-brand-600: #2259c9;
-  --color-brand-700: #1c47a0;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+
+  --color-paper: #f5f6f3;
+  --color-ink: #13232a;
+  --color-rule: #d6dcd9;
+  --color-highlight: #f3d36b;
+
+  --color-brand-50: #e3f0ee;
+  --color-brand-100: #c7e1dd;
+  --color-brand-500: #168482;
+  --color-brand-600: #0f6b68;
+  --color-brand-700: #0b5452;
+
+  --radius-control: 6px;
+  --radius-panel: 10px;
 }
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-paper text-ink antialiased;
+    font-feature-settings: "tnum" 1, "cv11" 1;
   }
+  h1 {
+    @apply font-serif tracking-tight;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* A significant result is marked like a highlighter stroke in a printed paper. */
+.mark-sig {
+  background: linear-gradient(transparent 55%, color-mix(in srgb, var(--color-highlight) 70%, transparent) 55%);
+  padding: 0 2px;
 }

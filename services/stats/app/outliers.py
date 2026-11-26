@@ -230,6 +230,8 @@ def detect(df: pd.DataFrame, columns: list[str], group_by: str | None = None, me
             ],
             "flagged": flagged_rows,
             "suggested_exclusions": [int(i) for i in data.index[chosen]],
+            "summary": (f"{int(chosen.sum())} of {len(data)} rows flagged by {METHOD_INFO[method].split(' (')[0]}"
+                        + (f" within {group_by}" if group_by else "") + "."),
             "warnings": warnings,
             "plot": {
                 "rows": [int(i) for i in data.index],

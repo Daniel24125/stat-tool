@@ -39,14 +39,14 @@ export function ClusterResult({ r }: { r: ClusterResults }) {
         <Card>
           <CardHeader><CardTitle>Clusters on the first two principal components</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={groupTraces(r.projection.x, r.projection.y, r.assignments.cluster.map((c) => `cluster ${c}`), text)}
+            <Plot name={"clusters-pc-projection"} data={groupTraces(r.projection.x, r.projection.y, r.assignments.cluster.map((c) => `cluster ${c}`), text)}
               layout={{ showlegend: true, legend: { orientation: "h", y: -0.2 }, xaxis: { title: { text: "PC1" } }, yaxis: { title: { text: "PC2" } } }} />
           </CardBody>
         </Card>
         <Card>
           <CardHeader><CardTitle>Silhouette width by number of clusters</CardTitle></CardHeader>
           <CardBody>
-            <Plot data={[
+            <Plot name={"clusters-silhouette"} data={[
               ...(sk.kmeans ? [{ type: "scatter" as const, mode: "lines+markers" as const, name: "k-means", x: sk.k, y: sk.kmeans }] : []),
               ...(sk.ward ? [{ type: "scatter" as const, mode: "lines+markers" as const, name: "Ward", x: sk.k, y: sk.ward }] : []),
             ]} layout={{ showlegend: true, legend: { orientation: "h", y: -0.2 }, xaxis: { title: { text: "k" }, dtick: 1 }, yaxis: { title: { text: "average silhouette" } },
@@ -58,7 +58,7 @@ export function ClusterResult({ r }: { r: ClusterResults }) {
       <Card>
         <CardHeader><CardTitle>Dendrogram (Ward linkage)</CardTitle></CardHeader>
         <CardBody>
-          <Plot data={dendro} layout={{ xaxis: { showticklabels: showLabels, tickvals: r.dendrogram.labels.map((_, i) => 5 + 10 * i), ticktext: r.dendrogram.labels, tickangle: -90, tickfont: { size: 9 }, showgrid: false }, yaxis: { title: { text: "distance" } } }} height={340} />
+          <Plot name={"clusters-dendrogram"} data={dendro} layout={{ xaxis: { showticklabels: showLabels, tickvals: r.dendrogram.labels.map((_, i) => 5 + 10 * i), ticktext: r.dendrogram.labels, tickangle: -90, tickfont: { size: 9 }, showgrid: false }, yaxis: { title: { text: "distance" } } }} height={340} />
         </CardBody>
       </Card>
       <Card>

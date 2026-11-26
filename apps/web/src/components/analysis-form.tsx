@@ -21,7 +21,7 @@ const TABS: { key: Type; label: string; help: string }[] = [
   { key: "CLUSTER", label: "Clustering", help: "Tries k-means and Ward hierarchical clustering for 2–10 clusters and picks the best by silhouette width, telling you whether real cluster structure exists." },
 ];
 
-function Chips({ options, value, onChange, max }: { options: string[]; value: string[]; onChange: (v: string[]) => void; max?: number }) {
+export function Chips({ options, value, onChange, max }: { options: string[]; value: string[]; onChange: (v: string[]) => void; max?: number }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {options.length === 0 && <span className="text-xs text-slate-400">No suitable columns.</span>}

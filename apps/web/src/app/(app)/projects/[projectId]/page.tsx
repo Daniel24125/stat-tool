@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileSpreadsheet, Settings } from "lucide-react";
+import { FileSpreadsheet, Plus, Settings, Workflow } from "lucide-react";
 import { UploadDataset } from "@/components/upload-dataset";
 import { Badge, Card, EmptyState } from "@/components/ui";
 import { db } from "@/lib/db";
@@ -14,7 +14,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
   const membership = await requireProjectRole(projectId, user.id);
   const project = await db.project.findUniqueOrThrow({
     where: { id: projectId },
-    include: { datasets: { orderBy: { createdAt: "desc" }, include: { createdBy: { select: { name: true, email: true } } } } },
+    include: {
+      datasets: { orderBy: { createdAt: "desc" }, include: { createdBy: { select: { name: true, email: true } } } },
+      pipelines: { orderBy: { updatedAt: "desc" }, include: { _count: { select: { runs: true } } } },
+    },
   });
   const canEdit = hasRole(membership.role, "EDITOR");
 
@@ -23,7 +26,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
       <div className="flex items-start justify-between">
         <div>
           <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-800">← Projects</Link>
-          <h1 className="mt-1 text-2xl font-semibold">{project.name}</h1>
+          <h1 className="mt-1 text-3xl">{project.name}</h1>
           {project.description && <p className="mt-1 text-sm text-slate-500">{project.description}</p>}
         </div>
         <Link href={`/projects/${projectId}/settings`} className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">
@@ -61,6 +64,24 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
             </table>
           </Card>
         )}
+      </div>
+      <div className="mt-8 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Pipelines</h2>
+        {canEdit && <Link href={`/projects/${projectId}/pipelines/new`} className="flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"><Plus className="h-4 w-4" /> New pipeline</Link>}
+      </div>
+      <p className="text-sm text-slate-500">Reusable sequences of steps (outliers → significance → multivariate) you can run on any dataset with the same columns.</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {project.pipelines.length === 0 && <p className="text-sm text-slate-400">No pipelines yet.</p>}
+        {project.pipelines.map((p) => (
+          <Link key={p.id} href={`/projects/${projectId}/pipelines/${p.id}`}>
+            <Card className="h-full transition hover:border-brand-500/50">
+              <div className="px-4 py-3">
+                <p className="flex items-center gap-2 font-medium"><Workflow className="h-4 w-4 text-brand-600" /> {p.name}</p>
+                <p className="mt-1 text-xs text-slate-500">{(p.steps as unknown[]).length} steps · {p._count.runs} runs</p>
+              </div>
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );

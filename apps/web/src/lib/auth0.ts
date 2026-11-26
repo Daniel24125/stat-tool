@@ -8,7 +8,8 @@ export const auth0 = new Auth0Client({
     const base = process.env.APP_BASE_URL ?? "http://localhost:3000";
     if (error) {
       // Log the real cause (e.g. invalid client secret); show the user a short message.
-      console.error("[auth0 callback]", error.code, error.message, (error as { cause?: unknown }).cause ?? "");
+      // Code and message only: the cause can include token-endpoint details.
+      console.error("[auth0 callback]", error.code, error.message);
       return NextResponse.redirect(new URL(`/?auth_error=${encodeURIComponent(error.code ?? "login_failed")}`, base));
     }
     const returnTo = ctx.returnTo?.startsWith("/") ? ctx.returnTo : "/dashboard";
